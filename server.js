@@ -2,11 +2,12 @@ require("dotenv").config();
 var path = require("path");
 var express = require("express");
 var webpack = require("webpack");
-var faker = require("faker");
 var AccessToken = require("twilio").jwt.AccessToken;
 var VideoGrant = AccessToken.VideoGrant;
+var cookieParser = require('cookie-parser');
 
 var app = express();
+app.use(cookieParser());
 if(process.env.NODE_ENV === "DEV") { // Configuration for development environment
     var webpackDevMiddleware = require("webpack-dev-middleware");
     var webpackHotMiddleware = require("webpack-hot-middleware");
@@ -17,6 +18,14 @@ if(process.env.NODE_ENV === "DEV") { // Configuration for development environmen
     }));
     app.use(webpackHotMiddleware(webpackCompiler));
     app.use(express.static(path.join(__dirname, "app")));
+    app.get("/lobby", (req, res) => {
+      res.writeHead(301,{Location: 'http://localhost:3000?redirect=lobby'});
+      res.end();
+    });
+    app.get("/table/:tableId", (req, res) => {
+      res.writeHead(301,{Location: 'http://localhost:3000?redirect=table&tableId=' + req.params.tableId});
+      res.end();
+    });
 } else if(process.env.NODE_ENV === "PROD") { // Configuration for production environment
     app.use(express.static(path.join(__dirname, "dist")));
 }
@@ -28,7 +37,7 @@ app.use(function(req, res, next){
 
 // Endpoint to generate access token
 app.get("/token", function(request, response) {
-    var identity = faker.name.findName();
+    var identity = request.cookies && request.cookies['id'] ? request.cookies['id'] : 'Anonymous';
 
     // Create an access token which we will sign and return to the client,
     // containing the grant we just created

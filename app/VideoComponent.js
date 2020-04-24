@@ -5,6 +5,10 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import { Card, CardHeader, CardText } from 'material-ui/Card';
 
+/*
+ * This class is not in use, it's only for reference in future dev
+ */
+
 export default class VideoComponent extends Component {
 	constructor(props) {
 		super();

@@ -1,20 +1,20 @@
 import React, { Component } from "react";
-import AppBar from 'material-ui/AppBar';
 import { render } from "react-dom";
 import "./styles/styles.css";
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import VirtualBar from './VirtualBar';
 
-import VideoComponent from './VideoComponent';
+const theme = createMuiTheme({
+  palette: {
+    type: 'dark',
+  }
+});
 
 let dom = document.getElementById("app");
 render(
-    <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
-        <div>
-            <AppBar title="React Twilio Video" />
-            <VideoComponent />
-        </div>
+    <MuiThemeProvider theme={theme}>
+        <VirtualBar />
     </MuiThemeProvider>
     ,
     dom

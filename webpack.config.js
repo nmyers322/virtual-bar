@@ -12,7 +12,7 @@ var configFunc = function(){
         ],
         output: {
             path: __dirname + "/dist",
-            filename: "bundle.js",
+            filename: "bundle.[hash].js",
             publicPath: "/"
         },
         module: {
@@ -32,8 +32,17 @@ var configFunc = function(){
                             loader: "css-loader" // translates CSS into CommonJS
                         }
                     ]
+                },
+                {
+                    test: /\.(png|jpe?g|gif)$/i,
+                    use: {
+                        loader: "file-loader",
+                    },
                 }
             ]
+        },
+        node: {
+            fs: "empty"
         },
         plugins: [
             new HtmlWebpackPlugin({
@@ -41,7 +50,7 @@ var configFunc = function(){
                 template: path.join(__dirname , "/app/index.html"),
                 inject: "body"
             }),
-            new webpack.BannerPlugin("React Twilio"),
+            new webpack.BannerPlugin("Gehenna - Virtual Bar"),
             new ExtractTextPlugin("[name]-[hash].css")
         ]};
     if(process.env.NODE_ENV === "PROD") {
