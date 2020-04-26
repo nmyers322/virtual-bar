@@ -304,18 +304,20 @@ export default class Table extends Component {
             removeParticipantTracks([track]);
         });
 
-        // When a Participant leaves the Room, detach its Tracks.
+        // When a Participant leaves the Room, detach everyone then reattach (to reshuffle preferred seats).
         room.on('participantDisconnected', participant => {
             console.log("Participant '" + participant.identity + "' left the room");
             this.addEventLog(participant.identity + ' has left.');
             removeParticipant(participant);
+            room.participants.forEach(existingParticipant => removeParticipant(existingParticipant));
+            room.participants.forEach(existingParticipant => addParticipant(existingParticipant, Array.from(existingParticipant.tracks.values())));
         });
 
         // Once the LocalParticipant leaves the room, detach the Tracks
         // of all Participants, including that of the LocalParticipant.
         room.on('disconnected', () => {
             removeParticipantTracks(Array.from(room.localParticipant.tracks.values()));
-            room.participants.forEach((participant) => removeParticipant(participant));
+            room.participants.forEach(participant => removeParticipant(participant));
             this.setState({ room: null });
         });
     }
