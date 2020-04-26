@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Video from 'twilio-video';
 import axios from 'axios';
 import table_abstract from './img/table_abstract.png';
+import user from './img/user.png';
 import AngleCalculator from './util/angleCalculator';
 import { Button, Typography } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
@@ -12,6 +13,9 @@ import VideocamOff from '@material-ui/icons/VideocamOff';
 import Mic from '@material-ui/icons/Mic';
 import MicOff from '@material-ui/icons/MicOff';
 import ExitToApp from '@material-ui/icons/ExitToApp';
+import Person from '@material-ui/icons/Person';
+import SyncDisabled from '@material-ui/icons/SyncDisabled';
+import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
 import history from './util/history';
 import moment from 'moment';
 
@@ -80,16 +84,14 @@ export default class Table extends Component {
 
     componentDidMount() {
         window.addEventListener('resize', this.calculateBackgroundStyle);
-        if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
-            this.initiateRoom();
-        }
-        navigator && navigator.mediaDevices && navigator.mediaDevices.enumerateDevices().then(devices => {
-            this.setState({
-                availableCameras: devices
-                    .filter(device => device.kind === 'videoinput')
-                    .map(device => device.deviceId)
-            });
-        });
+        this.initiateRoom();
+        // navigator && navigator.mediaDevices && navigator.mediaDevices.enumerateDevices().then(devices => {
+        //     this.setState({
+        //         availableCameras: devices
+        //             .filter(device => device.kind === 'videoinput')
+        //             .map(device => device.deviceId)
+        //     });
+        // });
     }
 
     componentWillUnmount() {
@@ -134,8 +136,7 @@ export default class Table extends Component {
             DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
                     if (permissionState === 'granted') {
-                        this.setState({ deviceOrientationPermissionGranted: true },
-                            () => this.initiateRoom());
+                        this.setState({ deviceOrientationPermissionGranted: true });
                     }
                 })
                 .catch(error => {
@@ -234,7 +235,7 @@ export default class Table extends Component {
         const addParticipantTracks = (participant, tracks) => {
             let index = this.state.participants.findIndex(identity => identity === participant.identity);
             if (index !== -1){
-                tracks.forEach(track => this.participantRefs[index].current.firstChild.appendChild(track.attach()));
+                tracks.forEach(track => this.participantRefs[index].current.firstChild.firstChild.appendChild(track.attach()));
             }
         }
 
@@ -340,11 +341,14 @@ export default class Table extends Component {
 
     render() {
         let {
+            audioEnabled,
             deviceOrientationPermissionGranted,
             motionScrollEnabled,
             room,
             roomFull,
-            tableImageStyle
+            selectedCamera,
+            tableImageStyle,
+            videoEnabled
         } = this.state;
 
         let grantPermissionButton = () => 
@@ -401,23 +405,23 @@ export default class Table extends Component {
                             ref={this.tableParticipantRowRef}>
                             <FlexGap />
                             <div ref={this.participantRefs[0]}>
-                                <Participant />
+                                <Participant participant={this.state.participants[0]} />
                             </div>
                             <FlexGap />
                             <div ref={this.participantRefs[1]}>
-                                <Participant />
+                                <Participant participant={this.state.participants[1]} />
                             </div>
                             <FlexGap />
                             <div ref={this.participantRefs[2]}>
-                                <Participant scrollIntoView={true} />
+                                <Participant participant={this.state.participants[2]} scrollIntoView={true} />
                             </div>
                             <FlexGap />
                             <div ref={this.participantRefs[3]}>
-                                <Participant />
+                                <Participant participant={this.state.participants[3]} />
                             </div>
                             <FlexGap />
                             <div ref={this.participantRefs[4]}>
-                                <Participant />
+                                <Participant participant={this.state.participants[4]} />
                             </div>
                             <FlexGap />
                         </div>;
@@ -426,7 +430,7 @@ export default class Table extends Component {
             <div className="component-wrapper">
                 <div className="component-content">
                     <div className="component-background-image" style={tableImageStyle} />
-                    { ( deviceOrientationPermissionGranted ?
+                    { ( (!motionScrollEnabled || (motionScrollEnabled && deviceOrientationPermissionGranted)) ?
                         room ?
                             tableParticipantRow()
                         :
@@ -438,16 +442,18 @@ export default class Table extends Component {
                     :
                         grantPermissionButton()
                     ) }
-                    <div style={{
-                        color:"white",
-                        marginTop: "5vh",
-                        marginLeft: "5vh",
-                        marginRight: "5vh"
-                    }}>
-                        { this.state.eventLog.slice().reverse().map((event, index) => 
-                            <Typography style={{fontSize: '10pt'}} key={index}>{event}</Typography>)
-                        }
-                    </div>
+                    { (motionScrollEnabled ? deviceOrientationPermissionGranted : true) && 
+                        <div style={{
+                            color:"white",
+                            marginTop: "5vh",
+                            marginLeft: "5vh",
+                            marginRight: "5vh"
+                        }}>
+                            { this.state.eventLog.slice().reverse().map((event, index) => 
+                                <Typography style={{fontSize: '10pt'}} key={index}>{event}</Typography>)
+                            }
+                        </div>
+                    }
                 </div>
                 <div className="table-sticky-footer">
                     <IconButton 
@@ -458,42 +464,63 @@ export default class Table extends Component {
                         onClick={(event) => {history.push('/lobby')}}>
                         <ExitToApp />
                     </IconButton>
+                    { room && motionScrollEnabled &&
+                        <IconButton
+                            color="default"
+                            aria-label="Disable Motion Scrolling"
+                            onClick={() => {
+                                this.setState({motionScrollEnabled: false});
+                                this.angleCalculator = null;
+                                this.centerParticipantRef.current && this.centerParticipantRef.current.scrollIntoView({
+                                    behavior: 'auto',
+                                    inline: 'center'
+                                });
+                            }}>
+                            <ThreeDRotation />
+                        </IconButton>
+                    }
+                    { room && !motionScrollEnabled &&
+                        <IconButton
+                            color="default"
+                            aria-label="Enable Motion Scrolling"
+                            onClick={() => this.setState({motionScrollEnabled: true})}>
+                            <SyncDisabled />
+                        </IconButton>
+                    }
                     { false &&
                         <IconButton 
                             color="default" 
                             aria-label="Switch Camera" 
-                            style={{}}
                             onClick={(event) => {
                                 // This doesn't seem to work :(
-                                let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                let tracks = Array.from(room.localParticipant.videoTracks.values());
                                 tracks.forEach(track => {
                                     track.disable();
                                 });
                                 navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia({
                                     audio: true,
                                     video: {
-                                        facingMode: { ideal: this.state.selectedCamera === 'user' ? 'environment' : 'user' }
+                                        facingMode: { ideal: selectedCamera === 'user' ? 'environment' : 'user' }
                                     }
                                 });
                                 tracks.forEach(track => {
                                     track.enable();
                                 });
                                 this.setState({
-                                    selectedCamera: this.state.selectedCamera === 'user' ? 'environment' : 'user'
+                                    selectedCamera: selectedCamera === 'user' ? 'environment' : 'user'
                                 });
                             }}>
                             <SwitchCamera />
                         </IconButton>
                     }
-                    { this.state.deviceOrientationPermissionGranted && this.state.videoEnabled &&
+                    { room && videoEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
                         <IconButton 
                             edge="start" 
                             color="default" 
-                            aria-label="Turn camera off" 
-                            style={{}}
+                            aria-label="Turn camera off"
                             onClick={(event) => {
-                                if(this.state.room) {
-                                    let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                if(room) {
+                                    let tracks = Array.from(room.localParticipant.videoTracks.values());
                                     tracks.forEach(track => {
                                         track.disable();
                                     });
@@ -505,15 +532,14 @@ export default class Table extends Component {
                             <Videocam />
                         </IconButton>
                     }
-                    { this.state.deviceOrientationPermissionGranted && !this.state.videoEnabled &&
+                    { room && !videoEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
                         <IconButton 
                             edge="start" 
                             color="secondary" 
-                            aria-label="Turn camera on" 
-                            style={{}}
+                            aria-label="Turn camera on"
                             onClick={(event) => {
-                                if(this.state.room) {
-                                    let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                if(room) {
+                                    let tracks = Array.from(room.localParticipant.videoTracks.values());
                                     tracks.forEach(track => {
                                         track.enable();
                                     });
@@ -525,15 +551,14 @@ export default class Table extends Component {
                             <VideocamOff />
                         </IconButton>
                     }
-                    { this.state.deviceOrientationPermissionGranted && this.state.audioEnabled &&
+                    { room && audioEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
                         <IconButton 
                             edge="start" 
                             color="default" 
-                            aria-label="Turn microphone off" 
-                            style={{}}
+                            aria-label="Turn microphone off"
                             onClick={(event) => {
-                                if(this.state.room) {
-                                    let tracks = Array.from(this.state.room.localParticipant.audioTracks.values());
+                                if(room) {
+                                    let tracks = Array.from(room.localParticipant.audioTracks.values());
                                     tracks.forEach(track => {
                                         track.disable();
                                     });
@@ -545,15 +570,14 @@ export default class Table extends Component {
                             <Mic />
                         </IconButton>
                     }
-                    { this.state.deviceOrientationPermissionGranted && !this.state.audioEnabled &&
+                    { room && !audioEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
                         <IconButton 
                             edge="start" 
                             color="secondary" 
-                            aria-label="Turn microphone on" 
-                            style={{}}
+                            aria-label="Turn microphone on"
                             onClick={(event) => {
-                                if(this.state.room) {
-                                    let tracks = Array.from(this.state.room.localParticipant.audioTracks.values());
+                                if(room) {
+                                    let tracks = Array.from(room.localParticipant.audioTracks.values());
                                     tracks.forEach(track => {
                                         track.enable();
                                     });
@@ -565,7 +589,7 @@ export default class Table extends Component {
                             <MicOff />
                         </IconButton>
                     }
-                    { this.state.deviceOrientationPermissionGranted && 
+                    { room && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
                         <div className="table-self-participant" ref={this.selfParticipantRef}>
                         </div>
                     }
@@ -577,8 +601,18 @@ export default class Table extends Component {
     
 class Participant extends Component {
     render() {
+        let userPresentBackgroundStyle = {
+            backgroundImage: 'url(' + user + ')',
+            backgroundColor: 'rgba(0, 0, 0, .5)',
+            backgroundPosition: 'center 0px'
+        };
         return (
-            <div className="table-participant">
+            <div className="table-participant-wrapper" style={this.props.participant && userPresentBackgroundStyle}>
+                <div className="table-participant" style={{opacity: '1'}}>
+                </div>
+                {this.props.participant &&
+                    <Typography style={{color: "#FFFFFF", textAlign: 'center'}}>{ this.props.participant }</Typography>
+                }
             </div>
         );
     }

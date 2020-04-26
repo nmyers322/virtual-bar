@@ -24,7 +24,6 @@ $ pm2 start server
 https://gehenna.club
 
 # Issues
-* Move participants when one leaves
 * Works on iPhone 8+ and X, Safarai
 * Works on Chrome on Windows
 * Need to check if video/audio is mounted and retry if not

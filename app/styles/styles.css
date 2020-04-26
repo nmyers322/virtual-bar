@@ -55,6 +55,10 @@ html, body, #app {
   flex-wrap: nowrap;
 }
 
+.table-participant-wrapper {
+  margin: auto;
+}
+
 .table-participant {
   width: 30vh;
   max-width: 30vh;
@@ -62,6 +66,9 @@ html, body, #app {
   max-height: 52vh;
   background: rgba(0, 0, 0, .5);
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .table-participant>video {
