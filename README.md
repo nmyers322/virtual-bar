@@ -38,6 +38,5 @@ https://gehenna.club
 * Handle user clicks deny on DeviceOrientationEvent
 * favicons
 * Upgrade to babel 7 / webpack 4
-* Camera on/off
-* Mic on/off
 * Switch cameras
+* Show that a seat is taken when there is not yet audio or video

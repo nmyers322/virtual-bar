@@ -60,17 +60,21 @@ export default class Table extends Component {
         this.movementSemaphorReleased = true;
 
         this.state = {
+            audioEnabled: true,
+            availableCameras: null,
             deviceOrientationPermissionGranted: typeof DeviceOrientationEvent.requestPermission !== 'function',
             eventLog: [],
             motionScrollEnabled: false,
             participants: this.otherParticipantsArray.map(i => null),
             room: null,
             roomFull: false,
+            selectedCamera: 'user',
             tableImageStyle: {
-                    backgroundImage: 'url(' + this.backgroundImage + ')',
-                    backgroundColor: '#181818',
-                    backgroundPosition: 'center 0px'
-                }
+                backgroundImage: 'url(' + this.backgroundImage + ')',
+                backgroundColor: '#181818',
+                backgroundPosition: 'center 0px'
+            },
+            videoEnabled: true
         }
     }
 
@@ -79,6 +83,13 @@ export default class Table extends Component {
         if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
             this.initiateRoom();
         }
+        navigator && navigator.mediaDevices && navigator.mediaDevices.enumerateDevices().then(devices => {
+            this.setState({
+                availableCameras: devices
+                    .filter(device => device.kind === 'videoinput')
+                    .map(device => device.deviceId)
+            });
+        });
     }
 
     componentWillUnmount() {
@@ -88,17 +99,8 @@ export default class Table extends Component {
     }
 
     addEventLog(event) {
-        let newEvents = [];
-        newEvents.push(moment().format('hh:mm:ss') + ': ' + event);
-        let i = 0;
-        this.state.eventLog.forEach(oldEvent => {
-            if (i < 2) {
-                newEvents.push(oldEvent);
-            }
-            i++;
-        });
         this.setState({
-            eventLog: newEvents
+            eventLog: [moment().format('hh:mm:ss') + ': ' + event]
         });
     }
 
@@ -249,7 +251,8 @@ export default class Table extends Component {
         const removeParticipantTracks = (tracks) => 
             tracks.forEach(track => track.detach().forEach(detachedElement => detachedElement.remove()));
 
-        console.log("Joined room");
+        console.log("Joined room", room);
+        console.log("Available cameras: ", this.state.availableCameras);
 
         // If the table is full, kick
         if(room.participants.length > (this.numberOfOtherParticipants + 1)) {
@@ -453,31 +456,117 @@ export default class Table extends Component {
                         onClick={(event) => {history.push('/lobby')}}>
                         <ExitToApp />
                     </IconButton>
-                    <IconButton 
-                        color="default" 
-                        aria-label="Switch Camera" 
-                        style={{}}
-                        onClick={(event) => {}}>
-                        <SwitchCamera />
-                    </IconButton>
-                    <IconButton 
-                        edge="start" 
-                        color="default" 
-                        aria-label="Turn video off" 
-                        style={{}}
-                        onClick={(event) => {}}>
-                        <Videocam />
-                    </IconButton>
-                    <IconButton 
-                        edge="start" 
-                        color="default" 
-                        aria-label="Turn microphone off" 
-                        style={{}}
-                        onClick={(event) => {}}>
-                        <Mic />
-                    </IconButton>
-                    <div className="table-self-participant" ref={this.selfParticipantRef}>
-                    </div>
+                    { false &&
+                        <IconButton 
+                            color="default" 
+                            aria-label="Switch Camera" 
+                            style={{}}
+                            onClick={(event) => {
+                                // This doesn't seem to work :(
+                                let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                tracks.forEach(track => {
+                                    track.disable();
+                                });
+                                navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia({
+                                    audio: true,
+                                    video: {
+                                        facingMode: { ideal: this.state.selectedCamera === 'user' ? 'environment' : 'user' }
+                                    }
+                                });
+                                tracks.forEach(track => {
+                                    track.enable();
+                                });
+                                this.setState({
+                                    selectedCamera: this.state.selectedCamera === 'user' ? 'environment' : 'user'
+                                });
+                            }}>
+                            <SwitchCamera />
+                        </IconButton>
+                    }
+                    { this.state.deviceOrientationPermissionGranted && this.state.videoEnabled &&
+                        <IconButton 
+                            edge="start" 
+                            color="default" 
+                            aria-label="Turn camera off" 
+                            style={{}}
+                            onClick={(event) => {
+                                if(this.state.room) {
+                                    let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                    tracks.forEach(track => {
+                                        track.disable();
+                                    });
+                                }
+                                this.setState({
+                                    videoEnabled: false
+                                });
+                            }}>
+                            <Videocam />
+                        </IconButton>
+                    }
+                    { this.state.deviceOrientationPermissionGranted && !this.state.videoEnabled &&
+                        <IconButton 
+                            edge="start" 
+                            color="secondary" 
+                            aria-label="Turn camera on" 
+                            style={{}}
+                            onClick={(event) => {
+                                if(this.state.room) {
+                                    let tracks = Array.from(this.state.room.localParticipant.videoTracks.values());
+                                    tracks.forEach(track => {
+                                        track.enable();
+                                    });
+                                }
+                                this.setState({
+                                    videoEnabled: true
+                                });
+                            }}>
+                            <VideocamOff />
+                        </IconButton>
+                    }
+                    { this.state.deviceOrientationPermissionGranted && this.state.audioEnabled &&
+                        <IconButton 
+                            edge="start" 
+                            color="default" 
+                            aria-label="Turn microphone off" 
+                            style={{}}
+                            onClick={(event) => {
+                                if(this.state.room) {
+                                    let tracks = Array.from(this.state.room.localParticipant.audioTracks.values());
+                                    tracks.forEach(track => {
+                                        track.disable();
+                                    });
+                                }
+                                this.setState({
+                                    audioEnabled: false
+                                });
+                            }}>
+                            <Mic />
+                        </IconButton>
+                    }
+                    { this.state.deviceOrientationPermissionGranted && !this.state.audioEnabled &&
+                        <IconButton 
+                            edge="start" 
+                            color="secondary" 
+                            aria-label="Turn microphone on" 
+                            style={{}}
+                            onClick={(event) => {
+                                if(this.state.room) {
+                                    let tracks = Array.from(this.state.room.localParticipant.audioTracks.values());
+                                    tracks.forEach(track => {
+                                        track.enable();
+                                    });
+                                }
+                                this.setState({
+                                    audioEnabled: true
+                                });
+                            }}>
+                            <MicOff />
+                        </IconButton>
+                    }
+                    { this.state.deviceOrientationPermissionGranted && 
+                        <div className="table-self-participant" ref={this.selfParticipantRef}>
+                        </div>
+                    }
                 </div>
             </div>
         );
