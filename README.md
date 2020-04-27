@@ -24,13 +24,11 @@ $ pm2 start server
 https://gehenna.club
 
 # Issues
-* Works on iPhone 8+ and X, Safarai
-* Works on Chrome on Windows
 * Need to check if video/audio is mounted and retry if not
+* Video/Audio not working? Remount components button
 * Needs oAuth, identity management, JWT verification, etc
 * Call API to get participants, show on tables, restrict access if table full
 * Ability to get drinks
-* Self-cam in bottom corner
 * Private tables
 * Clean up components, extract classes
 * Handle devices that do not support DeviceOrientationEvent
@@ -42,3 +40,6 @@ https://gehenna.club
 * Rearrange lobby, add tables
 * Move table event log on mobile
 * iOS grant device orientation unmounts video tracks
+* Draw on someone, take a pic, send to them
+* After visibility change kicks you out, tracks could still be attached. check getUserMedia and see what's happening
+* getUserMedia fail: More useful message about video/audio not working

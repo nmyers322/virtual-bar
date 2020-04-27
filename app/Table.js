@@ -33,6 +33,7 @@ export default class Table extends Component {
         this.grantDeviceOrientationPermission = this.grantDeviceOrientationPermission.bind(this);
         this.handleMovement = this.handleMovement.bind(this);
         this.handleRoomJoinSuccess = this.handleRoomJoinSuccess.bind(this);
+        this.handleVisibilityEvent = this.handleVisibilityEvent.bind(this);
         this.initiateRoom = this.initiateRoom.bind(this);
 
         this.tableId = this.props.match.params.tableId;
@@ -67,6 +68,7 @@ export default class Table extends Component {
             audioEnabled: true,
             availableCameras: null,
             deviceOrientationPermissionGranted: typeof DeviceOrientationEvent.requestPermission !== 'function',
+            disconnected: false,
             eventLog: [],
             motionScrollEnabled: false,
             participants: this.otherParticipantsArray.map(i => null),
@@ -84,6 +86,8 @@ export default class Table extends Component {
 
     componentDidMount() {
         window.addEventListener('resize', this.calculateBackgroundStyle);
+        window.addEventListener('pagehide', this.handleVisibilityEvent);
+        document.addEventListener("visibilitychange", this.handleVisibilityEvent);
         this.initiateRoom();
         // navigator && navigator.mediaDevices && navigator.mediaDevices.enumerateDevices().then(devices => {
         //     this.setState({
@@ -97,12 +101,18 @@ export default class Table extends Component {
     componentWillUnmount() {
         window.removeEventListener('resize', this.calculateBackgroundStyle);
         window.removeEventListener('deviceorientation', this.handleMovement);
+        window.removeEventListener('pagehide', this.handleVisibilityEvent);
+        document.removeEventListener("visibilitychange", this.handleVisibilityEvent);
         this.state.room && this.state.room.disconnect();
     }
 
     addEventLog(event) {
+        let newEventLog = [moment().format('hh:mm:ss') + ': ' + event];
+        if (this.state.eventLog.length > 0) {
+            newEventLog.push(this.state.eventLog[0]);
+        }
         this.setState({
-            eventLog: [moment().format('hh:mm:ss') + ': ' + event]
+            eventLog: newEventLog
         });
     }
 
@@ -137,6 +147,8 @@ export default class Table extends Component {
                 .then(permissionState => {
                     if (permissionState === 'granted') {
                         this.setState({ deviceOrientationPermissionGranted: true });
+                    } else {
+                        this.state.room && this.state.room.disconnect();
                     }
                 })
                 .catch(error => {
@@ -228,6 +240,8 @@ export default class Table extends Component {
                             addParticipantTracks(participant, tracks);
                         }
                     });
+            } else {
+                this.state.room && this.state.room.disconnect();
             }
         }
 
@@ -317,10 +331,22 @@ export default class Table extends Component {
         // Once the LocalParticipant leaves the room, detach the Tracks
         // of all Participants, including that of the LocalParticipant.
         room.on('disconnected', () => {
+            this.addEventLog("Leaving table...");
             removeParticipantTracks(Array.from(room.localParticipant.tracks.values()));
             room.participants.forEach(participant => removeParticipant(participant));
-            this.setState({ room: null });
+            this.setState({
+                disconnected: true, 
+                room: null
+            });
         });
+    }
+
+    handleVisibilityEvent(event) {
+        if (document.visibilityState !== 'visible') {
+            console.log("User kicked for losing browser focus");
+            this.addEventLog("User lost focus on browser and was kicked from table");
+            this.state.room && this.state.room.disconnect();
+        }
     }
 
     initiateRoom() {
@@ -333,6 +359,9 @@ export default class Table extends Component {
                         .then(this.handleRoomJoinSuccess, 
                             error => {
                                 alert('Could not connect to Twilio: ' + error.message);
+                                this.setState({
+                                    disconnected: true
+                                });
                             });
                 }
             );
@@ -343,6 +372,7 @@ export default class Table extends Component {
         let {
             audioEnabled,
             deviceOrientationPermissionGranted,
+            disconnected,
             motionScrollEnabled,
             room,
             roomFull,
@@ -383,6 +413,17 @@ export default class Table extends Component {
                             </div>
                         </div>;
 
+        let tableDisconnected = () => <div className="table-disconnected" style={{
+                            marginTop: "20vh"
+                        }}>
+                            <Typography variant="h4" style={{
+                                color: "#FFFFFF",
+                                textAlign: "center",
+                                width: "100%"
+                            }}>
+                                Disconnected from table
+                            </Typography>
+                        </div>;
 
         let tableIsFull = () => <div className="room-full" style={{
                             marginTop: "30vh"
@@ -431,18 +472,16 @@ export default class Table extends Component {
             <div className="component-wrapper">
                 <div className="component-content">
                     <div className="component-background-image" style={tableImageStyle} />
-                    { ( (!motionScrollEnabled || (motionScrollEnabled && deviceOrientationPermissionGranted)) ?
-                        room ?
-                            tableParticipantRow()
-                        :
-                            ( roomFull ?
-                                tableIsFull()
-                            :
-                                joiningTable()
-                            )
-                    :
-                        grantPermissionButton()
-                    ) }
+                    { (!motionScrollEnabled || (motionScrollEnabled && deviceOrientationPermissionGranted))
+                        ? room
+                            ? tableParticipantRow()
+                            : roomFull
+                                ? tableIsFull()
+                                : disconnected
+                                    ? tableDisconnected()
+                                    : joiningTable()
+                        : grantPermissionButton()
+                    }
                     { (motionScrollEnabled ? deviceOrientationPermissionGranted : true) && 
                         <div style={{
                             color:"white",
