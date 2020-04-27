@@ -9,6 +9,7 @@ const deviceBrowserDetect = {
                 navigator.mediaDevices.getUserMedia({video: true, audio: true})
                     .then(stream => {
                         stream.getTracks().forEach(track => track.stop());
+                        stream.stop && stream.stop();
                         resolve(true);
                     })
                     .catch(err => {

@@ -17,6 +17,7 @@ import lobby from './img/lobby.png';
 import { withTheme } from '@material-ui/core/styles';
 import deviceBrowserDetect from './util/deviceBrowserDetect';
 import Platform from './Platform';
+import PreloadImages from './PreloadImages';
 
 const VirtualBar = (props) =>
   {
@@ -67,6 +68,7 @@ const VirtualBar = (props) =>
                 <Route path="/table/:tableId" component={withTheme(Table)} />
                 <Route path="/" component={withTheme(Entry)} />
             </Switch>
+            <PreloadImages />
         </Router>
     </div>;
   }

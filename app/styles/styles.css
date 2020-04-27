@@ -231,3 +231,5 @@ html, body, #app {
     height: 2em;
   }
 }
+
+.preload-images { display: none; }

@@ -63,6 +63,7 @@ export default class Table extends Component {
         this.participantScrollValue = -1000;
 
         this.movementSemaphorReleased = true;
+        this.visibilitySemaphorReleased = true;
 
         this.state = {
             audioEnabled: true,
@@ -342,10 +343,16 @@ export default class Table extends Component {
     }
 
     handleVisibilityEvent(event) {
-        if (document.visibilityState !== 'visible') {
-            console.log("User kicked for losing browser focus");
-            this.addEventLog("User lost focus on browser and was kicked from table");
-            this.state.room && this.state.room.disconnect();
+        if (this.visibilitySemaphorReleased) {
+            this.visibilitySemaphorReleased = false;
+            setTimeout(() => {
+                if (document.visibilityState !== 'visible') {
+                    console.log("User kicked for losing browser focus");
+                    this.addEventLog("User lost focus on browser and was kicked from table");
+                    this.state.room && this.state.room.disconnect();
+                }
+                this.visibilitySemaphorReleased = true;
+            }, 5000);
         }
     }
 
