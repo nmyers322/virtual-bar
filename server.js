@@ -22,6 +22,10 @@ if(process.env.NODE_ENV === "DEV") { // Configuration for development environmen
       res.writeHead(301,{Location: 'http://localhost:3000?redirect=lobby'});
       res.end();
     });
+    app.get("/platform", (req, res) => {
+      res.writeHead(301,{Location: 'http://localhost:3000?redirect=platform'});
+      res.end();
+    });
     app.get("/table/:tableId", (req, res) => {
       res.writeHead(301,{Location: 'http://localhost:3000?redirect=table&tableId=' + req.params.tableId});
       res.end();

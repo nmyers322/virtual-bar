@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@material-ui/core';
+import { Button, Checkbox, FormControlLabel, Grid, Link, TextField, Typography } from '@material-ui/core';
 import * as Cookies from 'js-cookie';
 import xss from 'xss';
 import history from './util/history';
 import gehenna from './img/gehenna.png';
+import deviceBrowserDetect from './util/deviceBrowserDetect';
+import entry from './img/entry.png';
 
 const redirectOnDev = () => {
     if (location.host === "localhost:3000") {
@@ -14,6 +16,9 @@ const redirectOnDev = () => {
                 case 'lobby':
                    history.push('/lobby');
                    break;
+                case 'platform':
+                    history.push('/platform');
+                    break;
                 case 'table':
                     history.push('/table/' + qs.get('tableId'));
                     break;
@@ -31,6 +36,9 @@ export default class Entry extends Component {
 
         this.state = {
             acceptCookies: false,
+            actionInProgress: false,
+            deviceBrowserAllowed: true,
+            getUserMediaSupported: true,
             name: "",
             showCookieCheck: true,
             showIdCheck: false
@@ -40,14 +48,25 @@ export default class Entry extends Component {
     componentDidMount() {
         redirectOnDev();
 
+        let newState = {};
+
         if(Cookies.get('ac')) {
-            this.setState({
+            newState = {
                 acceptCookies: true,
                 name: Cookies.get('id') ? Cookies.get('id') : "",
                 showCookieCheck: false,
                 showIdCheck: true
-            });
+            };
         }
+
+        if(deviceBrowserDetect.isIOS() && !deviceBrowserDetect.isSafari()) {
+            newState.deviceBrowserAllowed = false;
+        }
+
+        if(Object.keys(newState).length > 0) {
+            this.setState(newState);
+        }
+
     }
 
     handleCookieCheckboxChange(event) {
@@ -67,101 +86,152 @@ export default class Entry extends Component {
                 showIdCheck: true
             });
         } else {
-            Cookies.set('id', this.state.name);
-            history.push('/lobby');
+            this.setState({
+                actionInProgress: true
+            }, () => {
+                deviceBrowserDetect.checkGetUserMediaExists()
+                    .then(exists => {
+                        Cookies.set('id', this.state.name);
+                        history.push('/lobby');
+                    })
+                    .catch(error => {
+                        this.setState({
+                            actionInProgress: false,
+                            getUserMediaSupported: false
+                        });
+                    });
+            });
+                
         }
     }
 
     render() {
+        let {
+            acceptCookies,
+            actionInProgress,
+            deviceBrowserAllowed,
+            getUserMediaSupported,
+            name,
+            showCookieCheck,
+            showIdCheck
+        } = this.state;
         return (
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-around',
-                alignItems: 'center'
-            }}>
+            <div className="component-wrapper">
+                <div className="component-background-image" style={{
+                    backgroundImage: 'url(' + entry + ')',
+                    backgroundColor: '#181818',
+                    backgroundPosition: 'center 0px'
+                    }} />
                 <div style={{
-                    maxWidth: '300px',
-                    marginTop: '5vh'
-                }}>
-                    <img src={gehenna} width="100%" height="100%" />
-                </div>
-                { this.state.showCookieCheck && 
-                    <div className="cookie-terms" style={{
-                        color: "#FFFFFF",
-                        marginTop: "10vh",
-                        marginLeft: "10vh",
-                        marginRight: "5vh"
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'top',
+                    alignItems: 'center',
+                    height: "100%"
                     }}>
-                        <Typography>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox 
-                                        checked={this.state.acceptCookies}
-                                        onChange={this.handleCookieCheckboxChange}    
-                                    />
-                                }
-                                label="I agree that this app can store local cookies on my device for user-based features."
-                            />
-                        </Typography>
-                    </div>
-                }
-                { this.state.showIdCheck && 
-                    <div className="id-check" style={{
-                        color: "#FFFFFF",
-                        marginTop: "10vh",
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                        maxWidth: '220px',
-                        textAlign: 'center'
-                    }}>
-                        <Typography style={{ marginBottom: '15px' }}>
-                            ID, please.
-                        </Typography>
-                        <div style={{
-                            width: '85%',
-                            height: '25%',
-                            backgroundColor: '#222222',
-                            border: 'solid 1px #EEEEEE',
-                            padding: '20px',
-                            paddingTop: '40px',
-                            paddingBottom: '40px',
-                            borderRadius: '15px'
+                    <div style={{
+                        maxWidth: '300px',
+                        marginTop: '5vh'
                         }}>
-                            <TextField 
-                                id="name" 
-                                label="Your Name"
-                                value={this.state.name}
-                                onChange={(event) => this.setState({name: event.target.value})}
-                            />
-                        </div>
+                        <img src={gehenna} width="100%" height="100%" />
                     </div>
-                }
-                <div className="enter-button" style={{
-                    textAlign: "center",
-                    marginTop: this.state.showCookieCheck ? "10vh" : this.state.showIdCheck ? "8vh" : "56vh"
-                }}>
-                    <Button 
-                        variant="outlined" 
-                        color="default" 
-                        size="large"
-                        disabled={!this.state.acceptCookies || (this.state.showIdCheck && this.state.name === "")}
-                        onClick={this.handleEnter}>
-                        ENTER
-                    </Button>
-                </div>
-                <div className="enter-button" style={{
-                    textAlign: "center",
-                    marginTop: "20vh",
-                    color: "#FFFFFF",
-                    margin: "5vh",
-                    backgroundColor: "#000000"
-                }}>
-                    <Typography>
-                        This is a prototype app and so far only works on Safari on iPhone 8+ or greater.
-                    </Typography>
+                    { (!deviceBrowserAllowed || !getUserMediaSupported) && 
+                        <CompatibilityInstructions /> 
+                    }
+                    { deviceBrowserAllowed && getUserMediaSupported && showCookieCheck && 
+                        <div className="cookie-terms" style={{
+                            color: "#FFFFFF",
+                            marginTop: "10vh",
+                            marginLeft: "10vh",
+                            marginRight: "5vh"
+                            }}>
+                            <Typography style={{fontSize: '12pt'}}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox 
+                                            checked={acceptCookies}
+                                            onChange={this.handleCookieCheckboxChange}    
+                                        />
+                                    }
+                                    label="I agree that this app can store local cookies on my device for user-based features."
+                                />
+                            </Typography>
+                        </div>
+                    }
+                    { deviceBrowserAllowed && getUserMediaSupported && showIdCheck && 
+                        <div className="id-check" style={{
+                            color: "#FFFFFF",
+                            marginTop: "10vh",
+                            marginLeft: "auto",
+                            marginRight: "auto",
+                            maxWidth: '220px',
+                            textAlign: 'center'
+                            }}>
+                            <Typography style={{ marginBottom: '15px' }}>
+                                ID, please.
+                            </Typography>
+                            <div style={{
+                                width: '85%',
+                                height: '25%',
+                                backgroundColor: '#222222',
+                                border: 'solid 1px #EEEEEE',
+                                padding: '20px',
+                                paddingTop: '40px',
+                                paddingBottom: '40px',
+                                borderRadius: '15px'
+                                }}>
+                                <TextField 
+                                    id="name" 
+                                    label="Your Name"
+                                    value={name}
+                                    onChange={(event) => this.setState({name: event.target.value})}
+                                />
+                            </div>
+                        </div>
+                    }
+                    { deviceBrowserAllowed && getUserMediaSupported &&
+                        <div className="enter-button" style={{
+                            textAlign: "center",
+                            marginTop: showCookieCheck ? "10vh" : showIdCheck ? "8vh" : "56vh"
+                            }}>
+                            <Button 
+                                variant="outlined" 
+                                color="default" 
+                                size="large"
+                                disabled={!acceptCookies || (showIdCheck && name === "") || !deviceBrowserAllowed || !getUserMediaSupported || actionInProgress}
+                                onClick={this.handleEnter}>
+                                { !actionInProgress && <div>ENTER</div> }
+                                { actionInProgress && <div className="mini-loader" /> }
+                            </Button>
+                        </div>
+                    }
                 </div>
             </div>
         );
+    }
+}
+
+class CompatibilityInstructions extends Component {
+    render() {
+        return <Grid item xs={10} sm={9} lg={6} style={{marginTop: '5vh'}}>
+            { deviceBrowserDetect.isIOS() &&
+                <Typography color="textPrimary">
+                    Welcome to the virtual bar video chat app. 
+                    It looks like you are on a device running 
+                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.apple.com/ios/ios-13/" target="new">iOS</Link> 
+                    but you are not using 
+                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.apple.com/safari/" target="new">Safari</Link>. 
+                    You must use Safari to access the camera and microphone. Open the Safari app from your home screen.
+                </Typography>
+            }
+            { !deviceBrowserDetect.isIOS() &&
+                <Typography color="textPrimary">
+                    Welcome to the virtual bar video chat app. 
+                    It looks like you are using a browser that does not support video and audio chat. 
+                    It's highly suggested that you use 
+                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.google.com/chrome/" target="new">Chrome</Link>.
+                </Typography>
+            }
+        </Grid>;
     }
 }

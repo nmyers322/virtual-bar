@@ -7,7 +7,7 @@ import VirtualBar from './VirtualBar';
 
 const theme = createMuiTheme({
   palette: {
-    type: 'dark',
+    type: 'dark'
   }
 });
 

@@ -376,9 +376,10 @@ export default class Table extends Component {
                                 Joining table...
                             </Typography>
                             <div style={{
-                                minHeight: '100px'
+                                minHeight: '100px',
+                                marginTop: '5vh'
                             }}>
-                                <div className="loader" />
+                                <div className="mini-loader" />
                             </div>
                         </div>;
 

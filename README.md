@@ -38,4 +38,7 @@ https://gehenna.club
 * favicons
 * Upgrade to babel 7 / webpack 4
 * Switch cameras
-* Show that a seat is taken when there is not yet audio or video
+* If directly linked to table or lobby, do entry checks and kick if not satisfied
+* Rearrange lobby, add tables
+* Move table event log on mobile
+* iOS grant device orientation unmounts video tracks

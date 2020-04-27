@@ -13,12 +13,10 @@ import Entry from './Entry';
 import Lobby from './Lobby';
 import { Router, Route, Switch, useLocation } from 'react-router-dom';
 import history from './util/history';
-import ComponentWrapper from './ComponentWrapper';
-import entry from './img/entry.png';
 import lobby from './img/lobby.png';
-
-const WrappedComponent = (WrappedComponent, backgroundImage) => (...props) => <ComponentWrapper backgroundImage={backgroundImage}><WrappedComponent {...props} /></ComponentWrapper>;
-
+import { withTheme } from '@material-ui/core/styles';
+import deviceBrowserDetect from './util/deviceBrowserDetect';
+import Platform from './Platform';
 
 const VirtualBar = (props) =>
   {
@@ -64,12 +62,13 @@ const VirtualBar = (props) =>
                 </Menu>
             </AppBar>
             <Switch>
-                <Route path="/lobby" component={WrappedComponent(Lobby, lobby)} />
-                <Route path="/table/:tableId" component={Table} />
-                <Route path="/" component={WrappedComponent(Entry, entry)} />
+                <Route path="/lobby" component={withTheme(Lobby)} />
+                <Route path="/platform" component={withTheme(Platform)} />
+                <Route path="/table/:tableId" component={withTheme(Table)} />
+                <Route path="/" component={withTheme(Entry)} />
             </Switch>
         </Router>
     </div>;
   }
 
-export default VirtualBar;
+export default withTheme(VirtualBar);

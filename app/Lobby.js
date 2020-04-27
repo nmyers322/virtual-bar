@@ -5,7 +5,7 @@ import { Button, Typography } from '@material-ui/core';
 import * as Cookies from 'js-cookie';
 import xss from 'xss';
 import history from './util/history';
-
+import lobby from './img/lobby.png';
 
 export default class Lobby extends Component {
     constructor(props) {
@@ -27,7 +27,12 @@ export default class Lobby extends Component {
 
     render() {
         return (
-            <div>
+            <div className="component-wrapper">
+                <div className="component-background-image" style={{
+                    backgroundImage: 'url(' + lobby + ')',
+                    backgroundColor: '#181818',
+                    backgroundPosition: 'center 0px'
+                    }} />
                 <div style={{
                     display: 'block',
                     textAlign: 'center',
