@@ -4,6 +4,11 @@ import "./styles/styles.css";
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import VirtualBar from './VirtualBar';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import reducer from './reducer';
+
+const store = createStore(reducer);
 
 const theme = createMuiTheme({
   palette: {
@@ -13,9 +18,11 @@ const theme = createMuiTheme({
 
 let dom = document.getElementById("app");
 render(
-    <MuiThemeProvider theme={theme}>
-        <VirtualBar />
-    </MuiThemeProvider>
+    <Provider store={store}>
+        <MuiThemeProvider theme={theme}>
+            <VirtualBar />
+        </MuiThemeProvider>
+    </Provider>
     ,
     dom
 );

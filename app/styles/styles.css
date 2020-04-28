@@ -49,7 +49,7 @@ html, body, #app {
 .table-participant-row {
   min-height: 60%;
   width: 100%;
-  margin-top: 80px;
+  margin-top: 10vh;
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;

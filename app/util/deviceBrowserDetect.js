@@ -8,7 +8,7 @@ const deviceBrowserDetect = {
             return new Promise((resolve, reject) => {
                 navigator.mediaDevices.getUserMedia({video: true, audio: true})
                     .then(stream => {
-                        stream.getTracks().forEach(track => track.stop());
+                        stream.getTracks().forEach(track => console.log(track) && track.stop());
                         stream.stop && stream.stop();
                         resolve(true);
                     })

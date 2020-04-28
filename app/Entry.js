@@ -130,8 +130,8 @@ export default class Entry extends Component {
                     height: "100%"
                     }}>
                     <div style={{
-                        maxWidth: '300px',
-                        marginTop: '5vh'
+                        maxWidth: '180px',
+                        marginTop: '2vh'
                         }}>
                         <img src={gehenna} width="100%" height="100%" />
                     </div>
@@ -141,7 +141,7 @@ export default class Entry extends Component {
                     { deviceBrowserAllowed && getUserMediaSupported && showCookieCheck && 
                         <div className="cookie-terms" style={{
                             color: "#FFFFFF",
-                            marginTop: "10vh",
+                            marginTop: "5vh",
                             marginLeft: "10vh",
                             marginRight: "5vh"
                             }}>
@@ -185,6 +185,7 @@ export default class Entry extends Component {
                                     label="Your Name"
                                     value={name}
                                     onChange={(event) => this.setState({name: event.target.value})}
+                                    onKeyUp={(event) => event.key === 'Enter' && this.handleEnter(event)}
                                 />
                             </div>
                         </div>
@@ -192,7 +193,7 @@ export default class Entry extends Component {
                     { deviceBrowserAllowed && getUserMediaSupported &&
                         <div className="enter-button" style={{
                             textAlign: "center",
-                            marginTop: showCookieCheck ? "10vh" : showIdCheck ? "8vh" : "56vh"
+                            marginTop: showCookieCheck ? "5vh" : showIdCheck ? "2vh" : "56vh"
                             }}>
                             <Button 
                                 variant="outlined" 

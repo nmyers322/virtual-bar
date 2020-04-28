@@ -7,6 +7,7 @@ import user from './img/user.png';
 import AngleCalculator from './util/angleCalculator';
 import { Button, Typography } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
+import Modal from '@material-ui/core/Modal';
 import SwitchCamera from '@material-ui/icons/SwitchCamera';
 import Videocam from '@material-ui/icons/Videocam';
 import VideocamOff from '@material-ui/icons/VideocamOff';
@@ -388,19 +389,51 @@ export default class Table extends Component {
             videoEnabled
         } = this.state;
 
-        let grantPermissionButton = () => 
-                        <div className="grant-permission-wrapper" style={{
-                            marginTop: "30vh",
-                            textAlign: "center"
-                        }}>
-                            <Button 
-                                variant="outlined" 
-                                color="default" 
-                                size="large"
-                                onClick={this.grantDeviceOrientationPermission}>
-                                Click to grant device permission to move around the table
-                            </Button>
-                        </div>;
+        let grantPermissionModal = () => 
+                        <Modal
+                            open={true}
+                            onClose={() => {
+                                this.setState({
+                                    motionScrollEnabled: false
+                                });
+                            }}
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-around',
+                                flexDirection: 'column',
+                                outline: 'none'
+                            }}
+                        >
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-around',
+                                flexDirection: 'column',
+                                height: '30vh',
+                                backgroundColor: '#333333',
+                                padding: '2vh',
+                                border: '0',
+                                borderRadius: '2vh 2vh',
+                                outline: 'none'
+                                }}>
+                                <Typography style={{color: '#FFFFFF'}}>
+                                    You have enabled motion-based scrolling which allows you to move your device around to view different people around the table. You must grant this device permission to use the motion-based features.
+                                </Typography>
+                                <Button 
+                                    variant="contained" 
+                                    color="default" 
+                                    size="large"
+                                    onClick={this.grantDeviceOrientationPermission}>
+                                    Grant permission
+                                </Button>
+                                <Button 
+                                    variant="outlined" 
+                                    color="default" 
+                                    size="small"
+                                    onClick={() => this.setState({motionScrollEnabled: false})}>
+                                    Cancel
+                                </Button>
+                            </div>
+                        </Modal>;
 
         let joiningTable = () => <div className="joining-table" style={{
                             marginTop: "20vh"
@@ -479,28 +512,27 @@ export default class Table extends Component {
             <div className="component-wrapper">
                 <div className="component-content">
                     <div className="component-background-image" style={tableImageStyle} />
-                    { (!motionScrollEnabled || (motionScrollEnabled && deviceOrientationPermissionGranted))
-                        ? room
-                            ? tableParticipantRow()
-                            : roomFull
-                                ? tableIsFull()
-                                : disconnected
-                                    ? tableDisconnected()
-                                    : joiningTable()
-                        : grantPermissionButton()
+                    { (motionScrollEnabled && !deviceOrientationPermissionGranted) &&
+                        grantPermissionModal()
                     }
-                    { (motionScrollEnabled ? deviceOrientationPermissionGranted : true) && 
-                        <div style={{
-                            color:"white",
-                            marginTop: "5vh",
-                            marginLeft: "5vh",
-                            marginRight: "5vh"
+                    { room
+                        ? tableParticipantRow()
+                        : roomFull
+                            ? tableIsFull()
+                            : disconnected
+                                ? tableDisconnected()
+                                : joiningTable()
+                    }
+                    <div style={{
+                        color:"white",
+                        marginTop: "5vh",
+                        marginLeft: "5vh",
+                        marginRight: "5vh"
                         }}>
-                            { this.state.eventLog.slice().reverse().map((event, index) => 
-                                <Typography style={{fontSize: '10pt'}} key={index}>{event}</Typography>)
-                            }
-                        </div>
-                    }
+                        { this.state.eventLog.slice().reverse().map((event, index) => 
+                            <Typography style={{fontSize: '10pt'}} key={index}>{event}</Typography>)
+                        }
+                    </div>
                 </div>
                 <div className="table-sticky-footer">
                     <IconButton 
@@ -560,7 +592,7 @@ export default class Table extends Component {
                             <SwitchCamera />
                         </IconButton>
                     }
-                    { room && videoEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
+                    { room && videoEnabled && 
                         <IconButton 
                             edge="start" 
                             color="default" 
@@ -579,7 +611,7 @@ export default class Table extends Component {
                             <Videocam />
                         </IconButton>
                     }
-                    { room && !videoEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
+                    { room && !videoEnabled && 
                         <IconButton 
                             edge="start" 
                             color="secondary" 
@@ -598,7 +630,7 @@ export default class Table extends Component {
                             <VideocamOff />
                         </IconButton>
                     }
-                    { room && audioEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
+                    { room && audioEnabled && 
                         <IconButton 
                             edge="start" 
                             color="default" 
@@ -617,7 +649,7 @@ export default class Table extends Component {
                             <Mic />
                         </IconButton>
                     }
-                    { room && !audioEnabled && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
+                    { room && !audioEnabled && 
                         <IconButton 
                             edge="start" 
                             color="secondary" 
@@ -636,7 +668,7 @@ export default class Table extends Component {
                             <MicOff />
                         </IconButton>
                     }
-                    { room && (motionScrollEnabled ? deviceOrientationPermissionGranted : true) &&
+                    { room && 
                         <div className="table-self-participant" ref={this.selfParticipantRef}>
                         </div>
                     }
@@ -658,7 +690,7 @@ class Participant extends Component {
                 <div className="table-participant" style={{opacity: '1'}}>
                 </div>
                 {this.props.participant &&
-                    <Typography style={{color: "#FFFFFF", textAlign: 'center'}}>{ this.props.participant }</Typography>
+                    <Typography style={{color: "#FFFFFF", textAlign: 'center', backgroundColor: '#000000'}}>{ this.props.participant }</Typography>
                 }
             </div>
         );

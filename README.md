@@ -24,11 +24,12 @@ $ pm2 start server
 https://gehenna.club
 
 # Issues
+* getUserMedia fail: More useful message about video/audio not working
+* After visibility change kicks you out, tracks could still be attached. check getUserMedia and see what's happening
+* Call API to get participants, show on tables, restrict access if table full
 * Need to check if video/audio is mounted and retry if not
 * Video/Audio not working? Remount components button
 * Needs oAuth, identity management, JWT verification, etc
-* Call API to get participants, show on tables, restrict access if table full
-* Ability to get drinks
 * Private tables
 * Clean up components, extract classes
 * Handle devices that do not support DeviceOrientationEvent
@@ -39,7 +40,4 @@ https://gehenna.club
 * If directly linked to table or lobby, do entry checks and kick if not satisfied
 * Rearrange lobby, add tables
 * Move table event log on mobile
-* iOS grant device orientation unmounts video tracks
 * Draw on someone, take a pic, send to them
-* After visibility change kicks you out, tracks could still be attached. check getUserMedia and see what's happening
-* getUserMedia fail: More useful message about video/audio not working
