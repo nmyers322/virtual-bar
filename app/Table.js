@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Video from 'twilio-video';
 import axios from 'axios';
@@ -20,7 +20,7 @@ import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
 import history from './util/history';
 import moment from 'moment';
 
-export default class Table extends Component {
+export default class Table extends React.PureComponent {
     constructor(props) {
         super(props);
 
@@ -362,11 +362,10 @@ export default class Table extends Component {
             const { token } = results.data;
             let options = {
                 name: this.tableId,
-                maxVideoBitrate: 1000000,
                 audio: true,
                 video: {
-                    width: 1280,
-                    height: 720,
+                    width: 640,
+                    height: 360,
                     frameRate: 24
                 }
             };
@@ -688,7 +687,7 @@ export default class Table extends Component {
     }
 }
     
-class Participant extends Component {
+class Participant extends React.PureComponent {
     render() {
         let userPresentBackgroundStyle = {
             backgroundImage: 'url(' + user + ')',
@@ -707,7 +706,7 @@ class Participant extends Component {
     }
 }
 
-class FlexGap extends Component {
+class FlexGap extends React.PureComponent {
     render() {
         return (
             <div className="table-flex-gap">

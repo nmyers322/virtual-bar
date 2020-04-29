@@ -185,7 +185,7 @@ export default class Entry extends Component {
                                     label="Your Name"
                                     value={name}
                                     onChange={(event) => this.setState({name: event.target.value})}
-                                    onKeyUp={(event) => event.key === 'Enter' && this.handleEnter(event)}
+                                    onKeyUp={(event) => event.key === 'Enter' && !actionInProgress && this.handleEnter(event)}
                                 />
                             </div>
                         </div>

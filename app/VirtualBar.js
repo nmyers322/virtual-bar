@@ -1,47 +1,21 @@
 import React from "react";
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Drawer from '@material-ui/core/Drawer';
+import AppBar from './AppBar';
 import Table from './Table';
 import Entry from './Entry';
 import Lobby from './Lobby';
+import DrunkFilter from './DrunkFilter';
 import { Router, Route, Switch, useLocation } from 'react-router-dom';
 import history from './util/history';
-import lobby from './img/lobby.png';
 import { withTheme } from '@material-ui/core/styles';
-import deviceBrowserDetect from './util/deviceBrowserDetect';
 import Platform from './Platform';
 import PreloadImages from './PreloadImages';
 import { connect } from 'react-redux';
 
 const VirtualBar = ({}) => {
-  const [anchor, setAnchor] = React.useState(null);
-  const menuOpen = Boolean(anchor);
   return <div className="full-size">
       <Router history={history}>
-          <AppBar position="fixed" style={{backgroundColor: 'rgb(64, 64, 64, 0.3)'}}>
-              <Toolbar>
-                  <IconButton 
-                    edge="start" 
-                    color="inherit" 
-                    aria-label="menu" 
-                    style={{ marginRight: '2vh'}}
-                    onClick={(event) => setAnchor(event.currentTarget)}>
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h6" style={{flexGrow: '1'}}>
-                    Gehenna
-                  </Typography>
-              </Toolbar>
-              
-          </AppBar>
+          <AppBar />
+          <DrunkFilter />
           <Switch>
               <Route path="/lobby" component={withTheme(Lobby)} />
               <Route path="/platform" component={withTheme(Platform)} />
@@ -54,11 +28,9 @@ const VirtualBar = ({}) => {
 }
 
 const mapStateToProps = state => ({
-
 });
 
 const mapDispatchToProps = dispatch => ({
-
 });
 
 export default withTheme(connect(mapStateToProps, mapDispatchToProps)(VirtualBar));
