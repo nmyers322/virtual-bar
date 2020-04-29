@@ -360,10 +360,20 @@ export default class Table extends Component {
     initiateRoom() {
         axios.get('/token').then(results => {
             const { token } = results.data;
+            let options = {
+                name: this.tableId,
+                maxVideoBitrate: 1000000,
+                audio: true,
+                video: {
+                    width: 1280,
+                    height: 720,
+                    frameRate: 24
+                }
+            };
             this.setState({ token },
                 () => {
                     console.log("Joining room '" + this.tableId + "'...");
-                    Video.connect(this.state.token, { name: this.tableId })
+                    Video.connect(this.state.token, options)
                         .then(this.handleRoomJoinSuccess, 
                             error => {
                                 alert('Could not connect to Twilio: ' + error.message);

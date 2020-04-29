@@ -75,7 +75,7 @@ export default class Entry extends Component {
 
     handleEnter() {
         if (this.state.name === "") {
-            Cookies.set('ac', true);
+            Cookies.set('ac', true, { expires: 9999999999 });
             let name = "";
             if (Cookies.get('id')) {
                 name = Cookies.get('id');
@@ -91,7 +91,7 @@ export default class Entry extends Component {
             }, () => {
                 deviceBrowserDetect.checkGetUserMediaExists()
                     .then(exists => {
-                        Cookies.set('id', this.state.name);
+                        Cookies.set('id', this.state.name, { expires: 9999999999 });
                         history.push('/lobby');
                     })
                     .catch(error => {
