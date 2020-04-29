@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Checkbox, FormControlLabel, Grid, Link, TextField, Typography } from '@material-ui/core';
+import { Button, Checkbox, FormControlLabel, Link, TextField, Typography } from '@material-ui/core';
 import * as Cookies from 'js-cookie';
 import xss from 'xss';
 import history from './util/history';
 import gehenna from './img/gehenna.png';
 import deviceBrowserDetect from './util/deviceBrowserDetect';
 import entry from './img/entry.png';
+import CompatibilityInstructions from './CompatibilityInstructions';
 
 const redirectOnDev = () => {
     if (location.host === "localhost:3000") {
@@ -38,6 +39,7 @@ export default class Entry extends Component {
             acceptCookies: false,
             actionInProgress: false,
             deviceBrowserAllowed: true,
+            deviceBrowserError: null,
             getUserMediaSupported: true,
             name: "",
             showCookieCheck: true,
@@ -97,6 +99,7 @@ export default class Entry extends Component {
                     .catch(error => {
                         this.setState({
                             actionInProgress: false,
+                            deviceBrowserError: error,
                             getUserMediaSupported: false
                         });
                     });
@@ -110,6 +113,7 @@ export default class Entry extends Component {
             acceptCookies,
             actionInProgress,
             deviceBrowserAllowed,
+            deviceBrowserError,
             getUserMediaSupported,
             name,
             showCookieCheck,
@@ -136,7 +140,7 @@ export default class Entry extends Component {
                         <img src={gehenna} width="100%" height="100%" />
                     </div>
                     { (!deviceBrowserAllowed || !getUserMediaSupported) && 
-                        <CompatibilityInstructions /> 
+                        <CompatibilityInstructions err={deviceBrowserError} /> 
                     }
                     { deviceBrowserAllowed && getUserMediaSupported && showCookieCheck && 
                         <div className="cookie-terms" style={{
@@ -209,30 +213,5 @@ export default class Entry extends Component {
                 </div>
             </div>
         );
-    }
-}
-
-class CompatibilityInstructions extends Component {
-    render() {
-        return <Grid item xs={10} sm={9} lg={6} style={{marginTop: '5vh'}}>
-            { deviceBrowserDetect.isIOS() &&
-                <Typography color="textPrimary">
-                    Welcome to the virtual bar video chat app. 
-                    It looks like you are on a device running 
-                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.apple.com/ios/ios-13/" target="new">iOS</Link> 
-                    but you are not using 
-                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.apple.com/safari/" target="new">Safari</Link>. 
-                    You must use Safari to access the camera and microphone. Open the Safari app from your home screen.
-                </Typography>
-            }
-            { !deviceBrowserDetect.isIOS() &&
-                <Typography color="textPrimary">
-                    Welcome to the virtual bar video chat app. 
-                    It looks like you are using a browser that does not support video and audio chat. 
-                    It's highly suggested that you use 
-                    <Link color="secondary" style={{marginLeft: '1vh', marginRight: '1vh'}} href="https://www.google.com/chrome/" target="new">Chrome</Link>.
-                </Typography>
-            }
-        </Grid>;
     }
 }

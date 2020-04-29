@@ -24,7 +24,6 @@ $ pm2 start server
 https://gehenna.club
 
 # Issues
-* getUserMedia fail: More useful message about video/audio not working
 * After visibility change kicks you out, tracks could still be attached. check getUserMedia and see what's happening
 * Call API to get participants, show on tables, restrict access if table full
 * Need to check if video/audio is mounted and retry if not
@@ -41,3 +40,4 @@ https://gehenna.club
 * Rearrange lobby, add tables
 * Move table event log on mobile
 * Draw on someone, take a pic, send to them
+* Remove drink if exiting bar
