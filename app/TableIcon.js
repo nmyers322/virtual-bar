@@ -29,28 +29,25 @@ const TableIcon = ({number, room, tableId}) => {
                 Table { number }
             </Typography>
             <img src={table_icon} width="80%" height="80%" />
-            { room &&
-                <div className="table-participant-count">
-                    { room.loading && !room.participants &&
-                        <div className="mini-loader" style={{marginTop: '10px'}}/>
-                    }
-                    { room.participants && 
-                        <Button
-                            size="small"
-                            onClick={event => {
-                                setParticipantsModal(true);
-                                event.stopPropagation && event.stopPropagation();
-                            }}
-                            >
-                            <Person /> {room.participants.length} / 5
-                        </Button>
-                    }
-                </div>
-            }
-            { participantsModal && room.participants &&
+            <div className="table-participant-count">
+                { room && room.loading &&
+                    <div className="mini-loader" style={{marginTop: '10px'}}/>
+                }
+                <Button
+                    size="small"
+                    disabled={!(room && room.participants && room.participants.length > 0)}
+                    onClick={event => {
+                        setParticipantsModal(true);
+                        event.stopPropagation && event.stopPropagation();
+                    }}
+                    >
+                    <Person /> {room && room.participants ? room.participants.length : 0} / {maxParticipants}
+                </Button>
+            </div>
+            { participantsModal &&
                 <ParticipantsModal
                     tableNumber={number}
-                    participants={room.participants}
+                    participants={room && room.participants ? room.participants : []}
                     maxParticipants={maxParticipants}
                     onClose={() => setParticipantsModal(false)}
                     onJoin={() => history.push('/table/' + tableId)} />

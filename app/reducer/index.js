@@ -35,12 +35,21 @@ const reducer = (state = initialState, action) => {
         case "RESET":
             return initialState;
         case "SET_ACTIVE_TABLES":
-            let newActiveTables = Object.assign({}, action.payload.activeTables);
+            let newActiveTables = Object.assign({rooms: []}, action.payload.activeTables);
             state.activeTables && state.activeTables.rooms && 
                 Object.keys(state.activeTables.rooms).map(roomId => {
-                    let newParticipants = state.activeTables.rooms[roomId].participants;
-                    if (action.payload.activeTables.rooms[roomId].participants) {
+                    let newParticipants = state.activeTables.rooms[roomId].participants || [];
+                    if (action.payload.activeTables.rooms && 
+                        action.payload.activeTables.rooms[roomId] &&
+                        action.payload.activeTables.rooms[roomId].participants) {
                         newParticipants = action.payload.activeTables.rooms[roomId].participants;
+                    } else if (action.payload.activeTables.rooms &&
+                        action.payload.activeTables.rooms[roomId] &&
+                        !action.payload.activeTables.rooms[roomId].loading) {
+                        newParticipants = [];
+                    }
+                    if (!newActiveTables.rooms[roomId]) {
+                        newActiveTables.rooms[roomId] = {};
                     }
                     newActiveTables.rooms[roomId].participants = newParticipants;
                 });
