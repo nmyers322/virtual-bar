@@ -33,6 +33,10 @@ html, body, #app {
   justify-content: space-around;
 }
 
+.table-icon-disabled {
+  opacity: .5;
+}
+
 .component-background-image {
   position: fixed;
   top: 0;
