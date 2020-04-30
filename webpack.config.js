@@ -53,7 +53,7 @@ var configFunc = function(){
             new webpack.BannerPlugin("Gehenna - Virtual Bar"),
             new ExtractTextPlugin("[name]-[hash].css")
         ]};
-    if(process.env.NODE_ENV === "PROD") {
+    if(process.env.NODE_ENV !== "DEV") {
         config.plugins.push(new webpack.optimize.UglifyJsPlugin());
         config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
             name: "commons",              

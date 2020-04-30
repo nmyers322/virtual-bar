@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
 import { withTheme } from '@material-ui/core/styles';
 import * as Cookies from 'js-cookie';
@@ -12,18 +12,42 @@ import { iconStyles } from './styles/iconStyles';
 import { fetchActiveTablesAction } from './actions/lobbyActions';
 import TableIcon from './TableIcon';
 
+const handleVisibilityEvent = (event) => {
+    setTimeout(() => {
+        if (document.visibilityState !== 'visible') {
+            console.log("User kicked for losing browser focus");
+            history.push('/');
+        }
+    }, 5000);
+}
+
 const Lobby = ({actionInProgress, activeTables, fetchActiveTables}) => {
 
     const [firstMount, setFirstMount] = useState(true);
-
-    if (!Cookies.get('ac') && !Cookies.get('id')) {
-        histoy.push('/');
-    }
 
     if (firstMount && !actionInProgress) {
         fetchActiveTables();
         setFirstMount(false);
     }
+
+    useEffect(() => {
+        if (!Cookies.get('ac') && !Cookies.get('id')) {
+            histoy.push('/');
+            return;
+        }
+        const interval = setInterval(() => {
+            if (!actionInProgress) {
+                fetchActiveTables();
+            }
+        }, 5000);
+        window.addEventListener('pagehide', handleVisibilityEvent);
+        document.addEventListener("visibilitychange", handleVisibilityEvent);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('pagehide', handleVisibilityEvent);
+            document.removeEventListener("visibilitychange", handleVisibilityEvent);
+        }
+    });
 
     return (
         <div className="component-wrapper">
