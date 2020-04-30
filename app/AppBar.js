@@ -19,10 +19,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Divider from '@material-ui/core/Divider';
 import Link from '@material-ui/core/Link';
+import { tableNumberFromPath } from './util/tables';
 
 const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
   const [anchor, setAnchor] = React.useState(null);
-  
   return <div>
     <AppBar position="fixed" style={{backgroundColor: 'rgb(64, 64, 64, 0.3)'}}>
         <Toolbar>
@@ -37,6 +37,11 @@ const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
             <Typography variant="h6" style={{flexGrow: '1'}}>
               Gehenna
             </Typography>
+            { (history.location.pathname.includes('table')) &&
+              <Typography>
+                Table { tableNumberFromPath(history.location.pathname) }
+              </Typography>
+            }
         </Toolbar>
         <Drawer open={anchor === 'left'} anchor={'left'} onClose={() => setAnchor(null)}>
           <div role="presentation" onClick={() => setAnchor(null)} onKeyDown={() => setAnchor(null)}>

@@ -19,14 +19,17 @@ import SyncDisabled from '@material-ui/icons/SyncDisabled';
 import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
 import history from './util/history';
 import moment from 'moment';
+import { tableSizes, defaultTableSize } from './util/tables';
 
 export default class Table extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.numberOfOtherParticipants = 5;
+        this.tableId = this.props.match.params.tableId;
+
+        this.numberOfOtherParticipants = tableSizes[this.tableId] ? (tableSizes[this.tableId] - 1) : (defaultTableSize - 1);
         this.otherParticipantsArray = Array(this.numberOfOtherParticipants).fill(null).map( (x,i) => i );
-        this.centerSeat = 2;
+        this.centerSeat = Math.floor(this.numberOfOtherParticipants/2);
         this.joinOrder = this.otherParticipantsArray.slice().sort((a, b) => Math.abs(a - this.centerSeat) - Math.abs(b - this.centerSeat) || b - a);
 
         this.addEventLog = this.addEventLog.bind(this);
@@ -36,8 +39,6 @@ export default class Table extends React.PureComponent {
         this.handleRoomJoinSuccess = this.handleRoomJoinSuccess.bind(this);
         this.handleVisibilityEvent = this.handleVisibilityEvent.bind(this);
         this.initiateRoom = this.initiateRoom.bind(this);
-
-        this.tableId = this.props.match.params.tableId;
 
         this.participantRefs = this.otherParticipantsArray.map(i => React.createRef());
         this.centerParticipantRef = this.participantRefs[this.centerSeat];
@@ -499,25 +500,11 @@ export default class Table extends React.PureComponent {
                             onScroll={this.calculateBackgroundStyle}
                             ref={this.tableParticipantRowRef}>
                             <FlexGap />
-                            <div ref={this.participantRefs[0]}>
-                                <Participant participant={this.state.participants[0]} />
-                            </div>
-                            <FlexGap />
-                            <div ref={this.participantRefs[1]}>
-                                <Participant participant={this.state.participants[1]} />
-                            </div>
-                            <FlexGap />
-                            <div ref={this.participantRefs[2]}>
-                                <Participant participant={this.state.participants[2]} scrollIntoView={true} />
-                            </div>
-                            <FlexGap />
-                            <div ref={this.participantRefs[3]}>
-                                <Participant participant={this.state.participants[3]} />
-                            </div>
-                            <FlexGap />
-                            <div ref={this.participantRefs[4]}>
-                                <Participant participant={this.state.participants[4]} />
-                            </div>
+                            { this.participantRefs.map((ref, index) => {
+                                return <div ref={ref} key={"participant-" + index}>
+                                    <Participant participant={this.state.participants[index]} />
+                                </div>
+                            })}
                             <FlexGap />
                         </div>;
 

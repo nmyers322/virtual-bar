@@ -71,6 +71,8 @@ html, body, #app {
   max-height: 52vh;
   background: rgba(0, 0, 0, .5);
   margin: auto;
+  margin-left: 1vh;
+  margin-right: 1vh;
   display: flex;
   flex-direction: column;
   justify-content: space-around;

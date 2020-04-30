@@ -7,7 +7,7 @@ import history from './util/history';
 import lobby from './img/lobby.png';
 import exit_door from './img/exit_door.png';
 import { connect } from 'react-redux';
-import { tableIds } from './util/tables';
+import { tableIds, tableSizes, defaultTableSize } from './util/tables';
 import { iconStyles } from './styles/iconStyles';
 import { fetchActiveTablesAction } from './actions/lobbyActions';
 import TableIcon from './TableIcon';
@@ -62,6 +62,7 @@ const Lobby = ({actionInProgress, activeTables, fetchActiveTables}) => {
                     tableIds.map((tableId, index) => 
                         <TableIcon 
                             tableId={tableId} 
+                            tableSize={tableSizes[tableId] ? tableSizes[tableId] : defaultTableSize}
                             key={tableId} 
                             number={index + 1} 
                             room={activeTables && activeTables.rooms && activeTables.rooms[tableId]}

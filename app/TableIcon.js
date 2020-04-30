@@ -8,13 +8,11 @@ import { iconStyles } from './styles/iconStyles';
 import history from './util/history';
 import ParticipantsModal from './ParticipantsModal';
 
-const maxParticipants = 6;
-
-const TableIcon = ({number, room, tableId}) => {
+const TableIcon = ({number, room, tableId, tableSize}) => {
     const [participantsModal, setParticipantsModal] = useState(false);
 
     const isMaxedOut = () => 
-        room && room.participants && room.participants.length >= maxParticipants;
+        room && room.participants && room.participants.length >= tableSize;
 
     return (
         <div 
@@ -41,14 +39,14 @@ const TableIcon = ({number, room, tableId}) => {
                         event.stopPropagation && event.stopPropagation();
                     }}
                     >
-                    <Person /> {room && room.participants ? room.participants.length : 0} / {maxParticipants}
+                    <Person /> {room && room.participants ? room.participants.length : 0} / {tableSize}
                 </Button>
             </div>
             { participantsModal &&
                 <ParticipantsModal
                     tableNumber={number}
                     participants={room && room.participants ? room.participants : []}
-                    maxParticipants={maxParticipants}
+                    maxParticipants={tableSize}
                     onClose={() => setParticipantsModal(false)}
                     onJoin={() => history.push('/table/' + tableId)} />
             }
