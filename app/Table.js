@@ -69,7 +69,7 @@ export default class Table extends React.PureComponent {
         this.state = {
             audioEnabled: true,
             availableCameras: null,
-            deviceOrientationPermissionGranted: typeof DeviceOrientationEvent.requestPermission !== 'function',
+            deviceOrientationPermissionGranted: false,
             disconnected: false,
             eventLog: [],
             motionScrollEnabled: false,
@@ -155,8 +155,10 @@ export default class Table extends React.PureComponent {
                 })
                 .catch(error => {
                     console.error(error);
-                    history.push('/');
+                    this.state.room && this.state.room.disconnect();
                 });
+        } else {
+            this.setState({ deviceOrientationPermissionGranted: true });
         }
     }
 
@@ -422,7 +424,9 @@ export default class Table extends React.PureComponent {
                                 padding: '2vh',
                                 border: '0',
                                 borderRadius: '2vh 2vh',
-                                outline: 'none'
+                                outline: 'none',
+                                maxWidth: '400px',
+                                margin: 'auto'
                                 }}>
                                 <Typography style={{color: '#FFFFFF'}}>
                                     You have enabled motion-based scrolling which allows you to move your device around to view different people around the table. You must grant this device permission to use the motion-based features.

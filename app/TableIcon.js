@@ -8,7 +8,7 @@ import { iconStyles } from './styles/iconStyles';
 import history from './util/history';
 import ParticipantsModal from './ParticipantsModal';
 
-const maxParticipants = 5;
+const maxParticipants = 6;
 
 const TableIcon = ({number, room, tableId}) => {
     const [participantsModal, setParticipantsModal] = useState(false);
@@ -31,7 +31,7 @@ const TableIcon = ({number, room, tableId}) => {
             <img src={table_icon} width="80%" height="80%" />
             { room &&
                 <div className="table-participant-count">
-                    { room.loading &&
+                    { room.loading && !room.participants &&
                         <div className="mini-loader" style={{marginTop: '10px'}}/>
                     }
                     { room.participants && 

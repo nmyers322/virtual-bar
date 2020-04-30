@@ -15,7 +15,7 @@ const ParticipantsModal = ({tableNumber, participants, maxParticipants, onClose,
         }}
         style={{
             display: 'flex',
-            justifyContent: 'space-around',
+            justifyContent: 'center',
             flexDirection: 'column',
             outline: 'none'
         }}>
@@ -27,7 +27,9 @@ const ParticipantsModal = ({tableNumber, participants, maxParticipants, onClose,
             padding: '2vh',
             border: '0',
             borderRadius: '2vh 2vh',
-            outline: 'none'
+            outline: 'none',
+            maxWidth: '400px',
+            margin: 'auto'
             }}>
             <Typography color="textPrimary">
                 Table { tableNumber } - Current Participants
