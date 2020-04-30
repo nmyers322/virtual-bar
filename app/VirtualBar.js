@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 const VirtualBar = ({}) => {
   return <div className="full-size">
       <Router history={history}>
-          <AppBar history={history} />
+          <AppBar />
           <DrunkFilter />
           <Switch>
               <Route path="/lobby" component={withTheme(Lobby)} />
