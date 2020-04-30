@@ -17,6 +17,8 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Divider from '@material-ui/core/Divider';
+import Link from '@material-ui/core/Link';
 
 const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
   const [anchor, setAnchor] = React.useState(null);
@@ -42,6 +44,7 @@ const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
               <ListItem key={'order-drink'}>
                 <ListItemText primary="Order Drink" />
               </ListItem>
+              <Divider />
               { Object.keys(drinks).map(drink => 
                 <ListItem 
                   key={drink} 
@@ -51,7 +54,25 @@ const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
                   <ListItemIcon><LocalBar /></ListItemIcon>
                   <ListItemText primary={drinks[drink].name} />
                 </ListItem>) 
-            }
+              }
+              <Divider />
+              <ListItem key={'drinks-by'}>
+                <ListItemText>
+                  Drink drawings by <Link href="https://trashmaiden.bigcartel.com/">Trash Maiden</Link>
+                </ListItemText>
+              </ListItem>
+              <Divider />
+              <ListItem key={'code-by'}>
+                <ListItemText>
+                  Code by <Link href="https://nate.technology">Nathanial Myers</Link>
+                </ListItemText>
+              </ListItem>
+              { history.location.pathname !== '/' && <Divider /> }
+              { history.location.pathname !== '/' &&
+                <ListItem onClick={() => history.push('/')}>
+                  <ListItemText primary="Exit Bar" />
+                </ListItem>
+              }
             </List>
           </div>
         </Drawer>
