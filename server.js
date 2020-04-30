@@ -5,8 +5,15 @@ var webpack = require("webpack");
 var AccessToken = require("twilio").jwt.AccessToken;
 var VideoGrant = AccessToken.VideoGrant;
 var cookieParser = require('cookie-parser');
+var axios = require('axios');
+var xss = require('xss');
+var validateUuid = require('uuid-validate');
 
 var app = express();
+
+const calculateAuthHeaderValue = () => 
+  Buffer.from(process.env.TWILIO_API_KEY + ':' + process.env.TWILIO_API_SECRET).toString('base64');
+
 app.use(cookieParser());
 if(process.env.NODE_ENV === "DEV") { // Configuration for development environment
     var webpackDevMiddleware = require("webpack-dev-middleware");
@@ -40,7 +47,7 @@ app.use(function(req, res, next){
 })
 
 // Endpoint to generate access token
-app.get("/token", function(request, response) {
+app.get("/api/token", function(request, response) {
     var identity = request.cookies && request.cookies['id'] ? request.cookies['id'] : 'Anonymous';
 
     // Create an access token which we will sign and return to the client,
@@ -63,6 +70,66 @@ app.get("/token", function(request, response) {
        identity: identity,
        token: token.toJwt()
    });
+});
+
+// Endpoint to get active rooms
+app.get("/api/rooms", (request, response) => {
+  let options = {
+    url: 'https://video.twilio.com/v1/Rooms',
+    method: 'get',
+    headers: {
+      'Authorization': 'Basic ' + calculateAuthHeaderValue()
+    }
+  };
+  axios(options)
+    .then(twilioResponse => {
+      console.log(JSON.stringify(twilioResponse.data));
+      var responseBody = {
+        rooms: twilioResponse.data.rooms
+          .filter(room => room.status === 'in-progress')
+          .map(room => room.unique_name)
+      }
+      response.send(JSON.stringify(responseBody));
+    })
+    .catch(err => {
+      console.log('twilio error');
+      console.log(err);
+      response.status(503);
+      response.send("Error contacting downstream service");
+    });
+});
+
+// Endpoint to get participants for a room
+app.get("/api/room/:roomId/participants", (request, response) => {
+  var roomId = xss(request.params.roomId);
+  if (!validateUuid(roomId)) {
+    response.status(400);
+    response.send("Invalid roomId");
+    return;
+  }
+  let options = {
+    url: 'https://video.twilio.com/v1/Rooms/' + roomId + '/Participants',
+    method: 'get',
+    headers: {
+      'Authorization': 'Basic ' + calculateAuthHeaderValue()
+    }
+  };
+  axios(options)
+    .then(twilioResponse => {
+      console.log(JSON.stringify(twilioResponse.data));
+      var responseBody = {
+        participants: twilioResponse.data.participants
+          .filter(dude => dude.status === 'connected')
+          .map(dude => dude.identity)
+      }
+      response.send(JSON.stringify(responseBody));
+    })
+    .catch(err => {
+      console.log('twilio error');
+      console.log(err);
+      response.status(503);
+      response.send("Error contacting downstream service");
+    });
 });
 
 

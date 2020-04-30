@@ -18,7 +18,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 
-const VirtualBarAppBar = ({currentDrink, setCurrentDrink}) => {
+const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
   const [anchor, setAnchor] = React.useState(null);
   
   return <div>
@@ -46,7 +46,7 @@ const VirtualBarAppBar = ({currentDrink, setCurrentDrink}) => {
                 <ListItem 
                   key={drink} 
                   button 
-                  disabled={!!currentDrink}
+                  disabled={!!currentDrink || (history && history.location && history.location.pathname === '/')}
                   onClick={() => !currentDrink && setCurrentDrink(drinks[drink])}>
                   <ListItemIcon><LocalBar /></ListItemIcon>
                   <ListItemText primary={drinks[drink].name} />

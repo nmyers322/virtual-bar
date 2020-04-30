@@ -8,6 +8,7 @@ import gehenna from './img/gehenna.png';
 import deviceBrowserDetect from './util/deviceBrowserDetect';
 import entry from './img/entry.png';
 import CompatibilityInstructions from './CompatibilityInstructions';
+import { connect } from 'react-redux';
 
 const redirectOnDev = () => {
     if (location.host === "localhost:3000") {
@@ -28,7 +29,7 @@ const redirectOnDev = () => {
     }
 }
 
-export default class Entry extends Component {
+class Entry extends Component {
     constructor(props) {
         super();
 
@@ -52,7 +53,7 @@ export default class Entry extends Component {
 
         let newState = {};
 
-        if(Cookies.get('ac')) {
+        if (Cookies.get('ac')) {
             newState = {
                 acceptCookies: true,
                 name: Cookies.get('id') ? Cookies.get('id') : "",
@@ -61,12 +62,16 @@ export default class Entry extends Component {
             };
         }
 
-        if(deviceBrowserDetect.isIOS() && !deviceBrowserDetect.isSafari()) {
+        if (deviceBrowserDetect.isIOS() && !deviceBrowserDetect.isSafari()) {
             newState.deviceBrowserAllowed = false;
         }
 
-        if(Object.keys(newState).length > 0) {
+        if (Object.keys(newState).length > 0) {
             this.setState(newState);
+        }
+
+        if (this.props.currentDrink) {
+            this.props.emptyDrink();
         }
 
     }
@@ -206,7 +211,7 @@ export default class Entry extends Component {
                                 disabled={!acceptCookies || (showIdCheck && name === "") || !deviceBrowserAllowed || !getUserMediaSupported || actionInProgress}
                                 onClick={this.handleEnter}>
                                 { !actionInProgress && <div>ENTER</div> }
-                                { actionInProgress && <div className="mini-loader" /> }
+                                { actionInProgress && <div className="loader" /> }
                             </Button>
                         </div>
                     }
@@ -215,3 +220,13 @@ export default class Entry extends Component {
         );
     }
 }
+
+const mapStateToProps = state => ({
+    currentDrink: state.currentDrink
+});
+
+const mapDispatchToProps = dispatch => ({
+    emptyDrink: () => dispatch({type:'SET_DRINK', payload: {currentDrink: null}})
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Entry);

@@ -358,7 +358,7 @@ export default class Table extends React.PureComponent {
     }
 
     initiateRoom() {
-        axios.get('/token').then(results => {
+        axios.get('/api/token').then(results => {
             const { token } = results.data;
             let options = {
                 name: this.tableId,
@@ -458,7 +458,7 @@ export default class Table extends React.PureComponent {
                                 minHeight: '100px',
                                 marginTop: '5vh'
                             }}>
-                                <div className="mini-loader" />
+                                <div className="loader" />
                             </div>
                         </div>;
 
