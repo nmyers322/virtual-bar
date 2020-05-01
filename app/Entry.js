@@ -7,6 +7,7 @@ import history from './util/history';
 import gehenna from './img/gehenna.png';
 import deviceBrowserDetect from './util/deviceBrowserDetect';
 import entry from './img/entry.png';
+import outside_bar from './img/outside_bar.png';
 import CompatibilityInstructions from './CompatibilityInstructions';
 import { connect } from 'react-redux';
 
@@ -129,8 +130,20 @@ class Entry extends Component {
                 <div className="component-background-image" style={{
                     backgroundImage: 'url(' + entry + ')',
                     backgroundColor: '#181818',
-                    backgroundPosition: 'center 0px'
+                    backgroundPosition: 'center 0px',
+                    zIndex: '-2'
                     }} />
+                <img src={outside_bar} style={{
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    textAlign: 'center',
+                    maxWidth: '90%',
+                    zIndex: '-1'
+                }} />
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -182,7 +195,7 @@ class Entry extends Component {
                             <div style={{
                                 width: '85%',
                                 height: '25%',
-                                backgroundColor: '#222222',
+                                backgroundColor: 'rgb(25, 25, 25, 0.6)',
                                 border: 'solid 1px #EEEEEE',
                                 padding: '20px',
                                 paddingTop: '40px',
@@ -209,7 +222,8 @@ class Entry extends Component {
                                 color="default" 
                                 size="large"
                                 disabled={!acceptCookies || (showIdCheck && name === "") || !deviceBrowserAllowed || !getUserMediaSupported || actionInProgress}
-                                onClick={this.handleEnter}>
+                                onClick={this.handleEnter}
+                                style={{backgroundColor: 'rgb(25, 25, 25, 0.6)'}}>
                                 { !actionInProgress && <div>ENTER</div> }
                                 { actionInProgress && <div className="loader" /> }
                             </Button>
