@@ -23,7 +23,6 @@ import { tableNumberFromPath } from './util/tables';
 import { withRouter } from 'react-router-dom';
 
 const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
-  console.log("Visited new path", history && history.location);
   const [anchor, setAnchor] = React.useState(null);
   return <div>
     <AppBar position="fixed" style={{backgroundColor: 'rgb(64, 64, 64, 0.3)'}}>

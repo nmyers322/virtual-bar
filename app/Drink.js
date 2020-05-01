@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Box from '@material-ui/core/Box';
 
 const Drink = ({drink, emptyDrink, increaseDrunkness}) => {
     let [classes, setClasses] = React.useState('drink-full');
@@ -21,7 +22,7 @@ const Drink = ({drink, emptyDrink, increaseDrunkness}) => {
                 break;
         }
     }
-    return <div>
+    return <Box zIndex="tooltip">
         { drink &&
             <img 
                 src={drink.url} 
@@ -29,7 +30,7 @@ const Drink = ({drink, emptyDrink, increaseDrunkness}) => {
                 onClick={() => calculateDrinkState(classes)}
             />
         }
-    </div>;
+    </Box>;
 }
 
 const mapStateToProps = state => ({
