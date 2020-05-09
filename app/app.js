@@ -7,6 +7,7 @@ import VirtualBar from './VirtualBar';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducer from './reducer';
+import './public/favicons';
 
 const store = createStore(reducer);
 
