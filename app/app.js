@@ -17,7 +17,7 @@ const theme = createMuiTheme({
   }
 });
 
-let dom = document.getElementById("app");
+let dom = document.getElementById("virtualbar");
 render(
     <Provider store={store}>
         <MuiThemeProvider theme={theme}>

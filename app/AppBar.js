@@ -21,6 +21,9 @@ import Divider from '@material-ui/core/Divider';
 import Link from '@material-ui/core/Link';
 import { tableNumberFromPath } from './util/tables';
 import { withRouter } from 'react-router-dom';
+import deviceBrowserDetect from './util/deviceBrowserDetect';
+
+const chromeVideoInsecureFixLink = "https://stackoverflow.com/a/24434461/2451856";
 
 const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
   const [anchor, setAnchor] = React.useState(null);
@@ -62,6 +65,16 @@ const VirtualBarAppBar = ({currentDrink, history, setCurrentDrink}) => {
                 </ListItem>) 
               }
               <Divider />
+              { deviceBrowserDetect.isChrome() &&
+                <ListItem key={'chrome-video-not-loading'}>
+                  <ListItemText style={{color: "#FF0000"}}>
+                    Video not loading? <Link style={{color: "#FF0000"}} href={chromeVideoInsecureFixLink}>How to fix</Link>
+                  </ListItemText>
+                </ListItem>
+              }
+              { deviceBrowserDetect.isChrome() &&
+                <Divider />
+              }
               <ListItem key={'drinks-by'}>
                 <ListItemText>
                   Drink drawings by <Link href="https://trashmaiden.bigcartel.com/">Trash Maiden</Link>

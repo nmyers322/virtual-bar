@@ -10,10 +10,12 @@ import { withTheme } from '@material-ui/core/styles';
 import Platform from './Platform';
 import PreloadImages from './PreloadImages';
 import { connect } from 'react-redux';
+import LiveStream from "./LiveStream";
 
 const VirtualBar = ({}) => {
   return <div className="full-size">
       <Router history={history}>
+          <LiveStream />
           <AppBar />
           <DrunkFilter />
           <Switch>
