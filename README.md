@@ -3,6 +3,10 @@ A React Video Chat app using Twilio Video - cloned from video-chat-react
 
 [Link to Full Article](https://www.twilio.com/blog/2018/03/video-chat-react.html)
 
+# Before You Start
+
+You need to copy the `.env.template` file into a new file called `.env`. If you want to run the app locally, you are in `DEV` mode, otherwise set it to `PROD` mode. Change the Twilio credentials to your own before trying to access the video capabilities.
+
 # Local Setup
 
 ```
