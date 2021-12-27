@@ -157,10 +157,10 @@ class Entry extends Component {
                         }}>
                         <img src={gehenna} width="100%" height="100%" />
                     </div>
-                    { (!deviceBrowserAllowed || !getUserMediaSupported) && 
+                    { (!deviceBrowserAllowed || !getUserMediaSupported) && !barClosed &&
                         <CompatibilityInstructions err={deviceBrowserError} /> 
                     }
-                    { deviceBrowserAllowed && getUserMediaSupported && showCookieCheck && 
+                    { deviceBrowserAllowed && getUserMediaSupported && showCookieCheck && !barClosed && 
                         <div className="cookie-terms" style={{
                             color: "#FFFFFF",
                             marginTop: "5vh",
@@ -180,7 +180,7 @@ class Entry extends Component {
                             </Typography>
                         </div>
                     }
-                    { deviceBrowserAllowed && getUserMediaSupported && showIdCheck && 
+                    { deviceBrowserAllowed && getUserMediaSupported && showIdCheck && !barClosed && 
                         <div className="id-check" style={{
                             color: "#FFFFFF",
                             marginTop: "10vh",
@@ -212,7 +212,7 @@ class Entry extends Component {
                             </div>
                         </div>
                     }
-                    { deviceBrowserAllowed && getUserMediaSupported &&
+                    { deviceBrowserAllowed && getUserMediaSupported && !barClosed &&
                         <div className="enter-button" style={{
                             textAlign: "center",
                             marginTop: showCookieCheck ? "5vh" : showIdCheck ? "2vh" : "56vh"
@@ -228,6 +228,20 @@ class Entry extends Component {
                                 { actionInProgress && <div className="loader" /> }
                             </Button>
                         </div>
+                    }
+                    { barClosed && 
+                        <div className="id-check" style={{
+                            color: "#FFFFFF",
+                            marginTop: "10vh",
+                            marginLeft: "auto",
+                            marginRight: "auto",
+                            maxWidth: '220px',
+                            textAlign: 'center'
+                            }}>
+                            <Typography style={{ marginBottom: '15px' }}>
+                                Bar is closed until further notice. We didn't pay the bills
+                                so our service is shut off. 
+                            </Typography>
                     }
                 </div>
             </div>
