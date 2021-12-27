@@ -133,7 +133,7 @@ app.get("/api/room/:roomId/participants", (request, response) => {
 });
 
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 9300;
 app.listen(port, function() {
     console.log("Express server listening on *:" + port);
 });
