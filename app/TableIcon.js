@@ -35,7 +35,8 @@ const TableIcon = ({number, room, tableId, tableSize}) => {
                     size="small"
                     disabled={!(room && room.participants && room.participants.length > 0)}
                     onClick={event => {
-                        setParticipantsModal(true);
+                        //setParticipantsModal(true);
+                        alert("Table video chat service is shut down until further notice. Order a drink instead!")
                         event.stopPropagation && event.stopPropagation();
                     }}
                     >
